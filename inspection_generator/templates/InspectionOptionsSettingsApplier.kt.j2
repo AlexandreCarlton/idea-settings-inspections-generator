@@ -1,0 +1,32 @@
+package com.github.alexandrecarlton.idea.settings.dagger.inspections
+
+import com.github.alexandrecarlton.idea.settings.applier.api.SettingsApplier
+{% for inspection in inspections -%}
+import com.github.alexandrecarlton.idea.settings.layout.editor.inspections.{{ inspection.sub_package }}.{{ inspection.class_name_prefix }}InspectionOptionsSettings
+{% endfor -%}
+import com.intellij.openapi.diagnostic.Logger
+import javax.inject.Inject
+import javax.inject.Provider
+
+/**
+ * Takes in any kind of Options class and apply the relevant settings applier to it.
+ */
+class InspectionOptionsSettingsApplier @Inject constructor() : SettingsApplier<Any> {
+
+    companion object {
+        private val LOG = Logger.getInstance(InspectionOptionsSettingsApplier::class.java)
+    }
+
+    // Avoid using constructor to circumvent parameter limits on the constructor.
+    {% for inspection in inspections -%}
+    @Inject
+    lateinit var {{ inspection.variable_name_prefix }}InspectionOptionsSettings: Provider<SettingsApplier<{{ inspection.class_name_prefix }}InspectionOptionsSettings>>
+    {% endfor %}
+    override fun apply(settings: Any) = when (settings) {
+        {% for inspection in inspections -%}
+        is {{ inspection.class_name_prefix }}InspectionOptionsSettings -> {{ inspection.variable_name_prefix }}InspectionOptionsSettings.get().apply(settings)
+        {% endfor %}
+        else -> LOG.warn("Unhandled inspection options: $settings")
+    }
+
+}

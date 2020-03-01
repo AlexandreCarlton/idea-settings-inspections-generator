@@ -1,0 +1,14 @@
+package com.github.alexandrecarlton.idea.settings.layout.editor.inspections.{{ sub_package }}
+
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.alexandrecarlton.idea.settings.layout.editor.inspections.base.BaseInspectionSettings
+{% for inspection in inspections %}
+typealias {{ inspection.class_name_prefix }}InspectionSettings = BaseInspectionSettings<{{ inspection.class_name_prefix }}InspectionOptionsSettings>
+{%- endfor %}
+
+data class {{ class_name_prefix }}InspectionsSettings(
+    {% for inspection in inspections | sort(attribute='variable_name_prefix') %}
+    @JsonProperty("{{ inspection.menu_name | replace('"', '\\"') }}")
+    val {{inspection.variable_name_prefix }}: {{ inspection.class_name_prefix }}InspectionSettings? = null{{ "," if not loop.last }}
+    {% endfor %}
+)

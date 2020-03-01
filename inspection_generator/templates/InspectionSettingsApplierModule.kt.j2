@@ -1,0 +1,28 @@
+package com.github.alexandrecarlton.idea.settings.dagger.project
+
+import com.github.alexandrecarlton.idea.settings.applier.api.SettingsApplier
+import com.github.alexandrecarlton.idea.settings.applier.impl.editor.inspections.base.BaseInspectionSettingsApplier
+{% for inspection in inspections -%}
+import com.github.alexandrecarlton.idea.settings.layout.editor.inspections.{{ inspection.sub_package }}.{{ inspection.class_name_prefix }}InspectionOptionsSettings
+import com.github.alexandrecarlton.idea.settings.layout.editor.inspections.{{ inspection.sub_package }}.{{ inspection.class_name_prefix }}InspectionSettings
+{% endfor -%}
+import com.intellij.codeInspection.ex.ToolsImpl
+import dagger.Binds
+import dagger.Module
+import javax.inject.Inject
+import javax.inject.Named
+
+{% for inspection in inspections -%}
+class {{ inspection.class_name_prefix }}InspectionSettingsApplier @Inject constructor(@Named("{{ inspection.short_name }}") toolsImpl: ToolsImpl) : BaseInspectionSettingsApplier<{{ inspection.class_name_prefix }}InspectionOptionsSettings>(toolsImpl)
+{% endfor %}
+/**
+ * All inspections here inherit from [BaseInspectionSettingsApplier] (declared above),
+ * parameterised on the options data class.
+ */
+@Module
+interface InspectionSettingsApplierModule {
+    {%- for inspection in inspections %}
+    @Binds
+    fun provide{{ inspection.class_name_prefix }}InspectionSettingsApplier(applier: {{ inspection.class_name_prefix }}InspectionSettingsApplier): SettingsApplier<{{ inspection.class_name_prefix }}InspectionSettings>
+    {%- endfor %}
+}

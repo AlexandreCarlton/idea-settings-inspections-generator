@@ -1,0 +1,16 @@
+package com.github.alexandrecarlton.idea.settings.dagger.inspections
+
+import com.github.alexandrecarlton.idea.settings.applier.api.SettingsApplier
+{% for inspection in inspections -%}
+import com.github.alexandrecarlton.idea.settings.layout.editor.inspections.{{ inspection.sub_package }}.{{ inspection.class_name_prefix }}InspectionOptionsSettings
+{% endfor -%}
+import dagger.Binds
+import dagger.Module
+
+@Module
+interface NoOpInspectionOptionsSettingsApplierModule {
+    {% for inspection in inspections %}
+    @Binds
+    fun provide{{ inspection.class_name_prefix }}InspectionOptionsSettings(applier: NoOpInspectionOptionsSettingsApplier<{{ inspection.class_name_prefix }}InspectionOptionsSettings>): SettingsApplier<{{ inspection.class_name_prefix }}InspectionOptionsSettings>
+    {% endfor %}
+}

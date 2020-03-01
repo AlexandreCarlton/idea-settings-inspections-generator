@@ -1,0 +1,21 @@
+package com.github.alexandrecarlton.idea.settings.dagger.project
+
+import com.intellij.codeInspection.ex.InspectionProfileImpl
+import com.intellij.openapi.project.Project
+import dagger.Module
+import dagger.Provides
+import javax.inject.Named
+
+/**
+ * Retrieves all possible ToolsImpl classes.
+ * Note that, for simplicity, the value in [Named] should match the first argument of [InspectionProfileImpl.getTools]
+ */
+@Module
+object ToolsImplModule {
+{% for short_name in short_names %}
+    @Provides
+    @Named("{{ short_name }}")
+    internal fun provide{{ short_name }}(inspectionProfileImpl: InspectionProfileImpl, project: Project) =
+        inspectionProfileImpl.getTools("{{ short_name }}", project)
+{% endfor -%}
+}

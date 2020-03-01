@@ -1,0 +1,20 @@
+package com.github.alexandrecarlton.idea.settings.applier.impl.editor.inspections.{{ sub_package }}
+
+import com.github.alexandrecarlton.idea.settings.applier.api.SettingsApplier
+{% for inspection in inspections -%}
+import com.github.alexandrecarlton.idea.settings.layout.editor.inspections.{{ inspection.sub_package }}.{{ inspection.class_name_prefix }}InspectionSettings
+{% endfor -%}
+import javax.inject.Inject
+
+class {{ class_name_prefix }}InspectionsSettingsApplier @Inject
+constructor(
+    {% for inspection in inspections | sort(attribute='variable_name_prefix') -%}
+    private val {{ inspection.variable_name_prefix }}InspectionSettingsApplier: SettingsApplier<{{ inspection.class_name_prefix }}InspectionSettings>{{ "," if not loop.last }}
+    {% endfor %}
+) : SettingsApplier<{{ class_name_prefix }}InspectionsSettings> {
+    override fun apply(settings: {{ class_name_prefix }}InspectionsSettings) {
+    	{%- for inspection in inspections | sort(attribute='variable_name_prefix') %}
+        settings.{{ inspection.variable_name_prefix }}?.let({{ inspection.variable_name_prefix }}InspectionSettingsApplier::apply)
+    	{%- endfor %}
+    }
+}
